@@ -6,7 +6,6 @@ from collections import Counter
 import jieba
 
 def clean_str(string):
-  #string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
   return re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string).strip().lower()
 
 
@@ -45,34 +44,19 @@ def pad_sentences(sentences, padding_word="<PAD/>"):
 
 
 def build_vocab(sentences):
-  """
-  Builds a vocabulary mapping from word to index based on the sentences.
-  Returns vocabulary mapping and inverse vocabulary mapping.
-  """
-  # Build vocabulary
   word_counts = Counter(itertools.chain(*sentences))
-  # Mapping from index to word
   vocabulary_inv = [x[0] for x in word_counts.most_common()]
-  # Mapping from word to index
   vocabulary = {x: i for i, x in enumerate(vocabulary_inv)}
   return [vocabulary, vocabulary_inv]
 
 
 def build_input_data(sentences, labels, vocabulary):
-  """
-  Maps sentencs and labels to vectors based on a vocabulary.
-  """
   x = np.array([[vocabulary[word] for word in sentence] for sentence in sentences])
   y = np.array(labels)
   return [x, y]
 
 
 def load_data():
-  """
-  Loads and preprocessed data for the MR dataset.
-  Returns input vectors, labels, vocabulary, and inverse vocabulary.
-  """
-  # Load and preprocess data
   sentences, labels = load_data_and_labels()
   sentences_padded = pad_sentences(sentences)
   vocabulary, vocabulary_inv = build_vocab(sentences_padded)
@@ -81,9 +65,6 @@ def load_data():
 
 
 def batch_iter(data, batch_size, num_epochs):
-  """
-  Generates a batch iterator for a dataset.
-  """
   data = np.array(data)
   data_size = len(data)
   num_batches_per_epoch = int(len(data)/batch_size) + 1
@@ -91,11 +72,10 @@ def batch_iter(data, batch_size, num_epochs):
         # Shuffle the data at each epoch
         if shuffle:
             shuffle_indices = np.random.permutation(np.arange(data_size))
-            shuffled_data = data[shuffle_indices]# shuffled_data按照上述乱序得到新的样本
+            shuffled_data = data[shuffle_indices]
         else:
             shuffled_data = data
-        for batch_num in range(num_batches_per_epoch):#开始生成batch
+        for batch_num in range(num_batches_per_epoch):
             start_index = batch_num * batch_size
-            end_index = min((batch_num + 1) * batch_size, data_size)#这里主要是最后一个batch可能不足batchsize的处理
+            end_index = min((batch_num + 1) * batch_size, data_size)
             yield shuffled_data[start_index:end_index]
-            #yield，在for循环执行时，每次返回一个batch的data，占用的内存为常数
