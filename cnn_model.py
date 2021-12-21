@@ -2,17 +2,11 @@ import tensorflow as tf
 
 
 class TCNNConfig(object):
-    """CNN配置参数"""
-    
-    embedding_size = 128  # 词向量维度
+    embedding_size = 128 
     num_filters=128
     #filter_sizes="3,4,5"
     l2_reg_lambda=0.0
-    '''
-
-    '''
 class TextCNN(object):
-    """文本分类，CNN模型"""
 
     def __init__(self,sequence_length, num_classes, vocab_size,filter_sizes,config):
         self.config = config
@@ -24,9 +18,7 @@ class TextCNN(object):
     
     def cnn(self,sequence_length, num_classes, vocab_size,filter_sizes,config):
         l2_loss = tf.constant(0.0)
-        self.config = config
-        """CNN模型"""
-       
+        self.config = config 
         with tf.device('/cpu:0'), tf.name_scope("embedding"):
             self.Variable = tf.Variable(
                 tf.random_uniform([vocab_size, self.config.embedding_size], -1.0, 1.0),
@@ -86,8 +78,6 @@ class TextCNN(object):
             losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
             self.loss = tf.reduce_mean(losses) + self.config.l2_reg_lambda * l2_loss
         
-        # Accuracy
         with tf.name_scope("accuracy"):
-            # 准确率
             correct_pred = tf.equal(tf.argmax(self.input_y, 1), self.y_pred_cls)
             self.acc = tf.reduce_mean(tf.cast(correct_pred, tf.float32),name="accuracy")
